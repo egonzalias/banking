@@ -23,11 +23,15 @@ services:
       context: ./customer-service
     ports:
       - "8081:8081"
-    #environment:
+    environment:
       #SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bankingdb
       #SPRING_DATASOURCE_USERNAME: banking_user
       #SPRING_DATASOURCE_PASSWORD: banking_pass
       #SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+
     #depends_on:
       #- postgres
     networks:
@@ -39,11 +43,15 @@ services:
       context: ./account-service
     ports:
       - "8082:8082"
-    #environment:
+    environment:
       #SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bankingdb
       #SPRING_DATASOURCE_USERNAME: banking_user
       #SPRING_DATASOURCE_PASSWORD: banking_pass
-      #SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      #SPRING_JPA_HIBERNATE_DDL_AUTO: update      
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+
     #depends_on:
       #- postgres
     networks:
