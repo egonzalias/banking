@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+
+  #postgres:
+    #image: postgres:15
+    #container_name: banking-postgres
+    #restart: always
+    #environment:
+      #POSTGRES_DB: bankingdb
+      #POSTGRES_USER: banking_user
+      #POSTGRES_PASSWORD: banking_pass
+    #ports:
+      #- "5432:5432"
+    #volumes:
+      #- postgres_data:/var/lib/postgresql/data
+    #networks:
+      #- banking-network
+
+  customer-service:
+    container_name: customer-service
+    build:
+      context: ./customer-service
+    ports:
+      - "8081:8081"
+    #environment:
+      #SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bankingdb
+      #SPRING_DATASOURCE_USERNAME: banking_user
+      #SPRING_DATASOURCE_PASSWORD: banking_pass
+      #SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    #depends_on:
+      #- postgres
+    networks:
+      - banking-network
+
+  account-service:
+    container_name: account-service
+    build:
+      context: ./account-service
+    ports:
+      - "8082:8082"
+    #environment:
+      #SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bankingdb
+      #SPRING_DATASOURCE_USERNAME: banking_user
+      #SPRING_DATASOURCE_PASSWORD: banking_pass
+      #SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    #depends_on:
+      #- postgres
+    networks:
+      - banking-network
+
+networks:
+  banking-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
