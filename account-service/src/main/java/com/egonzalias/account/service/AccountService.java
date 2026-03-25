@@ -4,6 +4,7 @@ import com.egonzalias.account.domain.Account;
 import com.egonzalias.account.domain.AccountTransaction;
 import com.egonzalias.account.dto.AccountBalanceResponse;
 import com.egonzalias.account.dto.CreateAccountRequest;
+import com.egonzalias.account.dto.TransactionCompletedEvent;
 import com.egonzalias.account.dto.TransactionResponse;
 import com.egonzalias.account.exception.AccountAlreadyExistsException;
 import com.egonzalias.account.exception.AccountNotFoundException;
@@ -23,11 +24,13 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final TransactionEventPublisher transactionEventPublisher;
 
     public AccountService(AccountRepository accountRepository,
-                          TransactionRepository transactionRepository) {
+                          TransactionRepository transactionRepository, TransactionEventPublisher transactionEventPublisher) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionEventPublisher = transactionEventPublisher;
     }
 
 
@@ -87,6 +90,16 @@ public class AccountService {
 
         transactionRepository.save(transaction);
         accountRepository.save(account);
+        transactionEventPublisher.publish(
+                new TransactionCompletedEvent(
+                        account.getCustomerId(),
+                        account.getAccountNumber(),
+                        type,
+                        amount,
+                        newBalance,
+                        LocalDateTime.now()
+                )
+        );
 
         return new TransactionResponse(
                 account.getAccountNumber(),
