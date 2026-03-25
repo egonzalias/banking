@@ -2,8 +2,11 @@ package com.egonzalias.customer.controller;
 
 
 import com.egonzalias.customer.domain.Customer;
+import com.egonzalias.customer.dto.CreateCustomerRequest;
+import com.egonzalias.customer.dto.UpdateCustomerRequest;
 import com.egonzalias.customer.service.CustomerService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,32 +23,41 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<Customer> create(@Valid @RequestBody Customer customer) {
-        return ResponseEntity.ok(service.create(customer));
+    public ResponseEntity<Customer> createCustomer(
+            @Valid @RequestBody CreateCustomerRequest request
+    ) {
+        Customer created = service.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<Customer> getCustomerById(
+            @PathVariable("id") Long id
+    ) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<Customer>> getAll() {
+    public ResponseEntity<List<Customer>> getAllCustomers() {
         return ResponseEntity.ok(service.getAll());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> update(
-            @PathVariable Long id,
-            @Valid @RequestBody Customer customer
+    public ResponseEntity<Customer> updateCustomer(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateCustomerRequest request
     ) {
-        return ResponseEntity.ok(service.update(id, customer));
+        Customer updated = service.update(id, request);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCustomer(
+            @PathVariable("id") Long id
+    ) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }
 

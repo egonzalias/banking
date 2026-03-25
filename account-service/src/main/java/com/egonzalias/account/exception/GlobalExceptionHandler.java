@@ -38,6 +38,14 @@ public class GlobalExceptionHandler {
                 .body("Insufficient balance");
     }
 
+    @ExceptionHandler(AccountAlreadyExistsException.class)
+    public ResponseEntity<String> handleDuplicate(AccountAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleGeneric(RuntimeException ex) {
         return ResponseEntity
