@@ -1,0 +1,114 @@
+Crear clientes
+-------
+{
+  "name": "Jose Lema",
+  "gender": "Male",
+  "age": 32,
+  "identification": "0102030405",
+  "address": "Otavalo sn y principal",
+  "phone": "098254785",
+  "password": "1234",
+  "active": true
+}
+---
+{
+  "name": "Marianela Montalvo",
+  "gender": "Female",
+  "age": 29,
+  "identification": "0102030406",
+  "address": "Amazonas y NNUU",
+  "phone": "097548965",
+  "password": "5678",
+  "active": true
+}
+--
+{
+  "name": "Juan Osorio",
+  "gender": "Male",
+  "age": 40,
+  "identification": "0102030407",
+  "address": "13 junio y Equinoccial",
+  "phone": "098874587",
+  "password": "1245",
+  "active": true
+}
+
+
+
+
+CREAR CUENTAS
+-------------
+{
+  "accountNumber": "478758",
+  "accountType": "AHORRO",
+  "initialBalance": 2000,
+  "active": true,
+  "customerId": 1
+}
+---
+{
+  "accountNumber": "225487",
+  "accountType": "CORRIENTE",
+  "initialBalance": 100,
+  "active": true,
+  "customerId": 2
+}
+---
+{
+  "accountNumber": "495878",
+  "accountType": "AHORROS",
+  "initialBalance": 0,
+  "active": true,
+  "customerId": 2
+}
+---
+{
+  "accountNumber": "496825",
+  "accountType": "AHORROS",
+  "initialBalance": 540,
+  "active": true,
+  "customerId": 3
+}
+---
+{
+  "accountNumber": "585545",
+  "accountType": "CORRIENTE",
+  "initialBalance": 1000,
+  "active": true,
+  "customerId": 1
+}
+
+
+
+
+
+
+
+
+
+
+TRANSACCIONES
+----------------
+{
+  "accountNumber": "478758",
+  "amount": -575,
+  "type": "RETIRO"
+}
+---
+{
+  "accountNumber": "225487",
+  "amount": 600,
+  "type": "DEPOSITO"
+}
+---
+{
+  "accountNumber": "495878",
+  "amount": 150,
+  "type": "DEPOSITO"
+}
+---
+{
+  "accountNumber": "496825",
+  "amount": -540,
+  "type": "RETIRO"
+}
