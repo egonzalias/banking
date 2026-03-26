@@ -1,24 +1,37 @@
-Banking API
+## Banking API
 Simple banking API built with Spring Boot.
 It provides basic functionality for managing customers, accounts, transactions and account statements.
 
-Tech Stack
+## Tech Stack
 
-Java 17
+Java 21
 Spring Boot
 Spring Data JPA
 H2 (in-memory DB)
 Maven
 
 
-How to run
-Shellmvn spring-boot:run``Mostrar más líneas
-The application starts on port 8080.
+## Environment Variables
+
+The application integrates with AWS SQS for publishing transaction events.
+
+If you want to enable event publishing locally, you can set the following environment variables:
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+
+Otherwise, the application can be run locally without AWS configuration for API validation
+
+
+## How to run
+mvn spring-boot:run
+The application starts on port 8081 for customer microservice and 8082 for account microservice.
 Base URL:
-http://localhost:8080
+http://localhost:8081
 
 
-API Endpoints
+## API Endpoints
 Customers
 Create customer
 POST /api/v1/customers
@@ -54,11 +67,15 @@ Get account statement by customer and date range
 GET /api/v1/reports?customerId={id}&from={yyyy-MM-dd}&to={yyyy-MM-dd}
 
 
-Testing
+## Testing
 
 Unit tests for service layer
 Integration test for transaction registration and persistence
 
 Run tests with:
-Shellmvn testMostrar más líneas
+mvn test
 
+
+## Docker (optional)
+
+The application can also be started using Docker. A docker-compose file is included in the repository.
