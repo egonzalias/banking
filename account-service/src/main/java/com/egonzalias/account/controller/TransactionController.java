@@ -2,10 +2,10 @@ package com.egonzalias.account.controller;
 
 
 
-import com.egonzalias.account.domain.AccountTransaction;
 import com.egonzalias.account.dto.CreateTransactionRequest;
 import com.egonzalias.account.dto.TransactionResponse;
 import com.egonzalias.account.service.AccountService;
+import com.egonzalias.account.service.impl.AccountServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -5,6 +5,7 @@ import com.egonzalias.customer.domain.Customer;
 import com.egonzalias.customer.dto.CreateCustomerRequest;
 import com.egonzalias.customer.dto.UpdateCustomerRequest;
 import com.egonzalias.customer.service.CustomerService;
+import com.egonzalias.customer.service.impl.CustomerServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
