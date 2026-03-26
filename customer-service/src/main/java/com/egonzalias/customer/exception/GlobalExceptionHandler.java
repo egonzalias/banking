@@ -1,6 +1,7 @@
 package com.egonzalias.customer.exception;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,43 +14,64 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<String> handleResourceNotFound(
+            ResourceNotFoundException ex
+    ) {
+        log.warn("Resource not found: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<Map<String, String>> handleValidation(
+            MethodArgumentNotValidException ex
+    ) {
+        log.warn("Validation error in request");
 
+        Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+                .forEach(error ->
+                        errors.put(error.getField(), error.getDefaultMessage())
+                );
 
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleGeneric(RuntimeException ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ex.getMessage());
-    }
-
-
     @ExceptionHandler(CustomerAlreadyExistsException.class)
-    public ResponseEntity<String> handleCustomerDuplicate(CustomerAlreadyExistsException ex) {
+    public ResponseEntity<String> handleCustomerDuplicate(
+            CustomerAlreadyExistsException ex
+    ) {
+        log.warn("Customer already exists: {}", ex.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(ex.getMessage());
     }
 
     @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(CustomerNotFoundException ex) {
+    public ResponseEntity<String> handleCustomerNotFound(
+            CustomerNotFoundException ex
+    ) {
+        log.warn("Customer not found: {}", ex.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleGeneric(RuntimeException ex) {
+        log.error("Unexpected error occurred", ex);
 
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Internal server error");
+    }
 }
 

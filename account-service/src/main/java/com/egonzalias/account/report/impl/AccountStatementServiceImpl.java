@@ -10,6 +10,8 @@ import com.egonzalias.account.dto.TransactionDetail;
 import com.egonzalias.account.report.AccountStatementService;
 import com.egonzalias.account.repository.AccountRepository;
 import com.egonzalias.account.repository.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +21,9 @@ import java.util.List;
 
 @Service
 public class AccountStatementServiceImpl implements AccountStatementService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(AccountStatementServiceImpl.class);
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
@@ -37,10 +42,21 @@ public class AccountStatementServiceImpl implements AccountStatementService {
             LocalDate from,
             LocalDate to
     ) {
+        log.info(
+                "Generating account statement, customerId={}, from={}, to={}",
+                customerId, from, to
+        );
+
         LocalDateTime fromDateTime = from.atStartOfDay();
         LocalDateTime toDateTime = to.atTime(LocalTime.MAX);
 
-        List<Account> accounts = accountRepository.findByCustomerId(customerId);
+        List<Account> accounts =
+                accountRepository.findByCustomerId(customerId);
+
+        log.info(
+                "Found {} accounts for customerId={}",
+                accounts.size(), customerId
+        );
 
         List<AccountStatementDetail> accountDetails = accounts.stream()
                 .map(account -> {
@@ -50,6 +66,12 @@ public class AccountStatementServiceImpl implements AccountStatementService {
                                     fromDateTime,
                                     toDateTime
                             );
+
+                    log.debug(
+                            "Account {} has {} transactions in period",
+                            account.getAccountNumber(),
+                            transactions.size()
+                    );
 
                     return new AccountStatementDetail(
                             account.getAccountNumber(),
@@ -62,9 +84,13 @@ public class AccountStatementServiceImpl implements AccountStatementService {
                 })
                 .toList();
 
+        log.info(
+                "Account statement generated successfully, customerId={}, accounts={}",
+                customerId, accountDetails.size()
+        );
+
         return new AccountStatementResponse(customerId, accountDetails);
     }
-
 
     private TransactionDetail mapTransaction(AccountTransaction tx) {
         return new TransactionDetail(

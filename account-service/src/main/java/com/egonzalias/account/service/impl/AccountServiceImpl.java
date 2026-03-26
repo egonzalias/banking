@@ -13,6 +13,8 @@ import com.egonzalias.account.repository.AccountRepository;
 import com.egonzalias.account.repository.TransactionRepository;
 import com.egonzalias.account.service.AccountService;
 import com.egonzalias.account.service.TransactionEventPublisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +26,16 @@ import java.time.LocalDateTime;
 @Transactional
 public class AccountServiceImpl implements AccountService {
 
+    private static final Logger log =
+            LoggerFactory.getLogger(AccountServiceImpl.class);
+
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final TransactionEventPublisher transactionEventPublisher;
 
     public AccountServiceImpl(AccountRepository accountRepository,
-                              TransactionRepository transactionRepository, TransactionEventPublisher transactionEventPublisher) {
+                              TransactionRepository transactionRepository,
+                              TransactionEventPublisher transactionEventPublisher) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.transactionEventPublisher = transactionEventPublisher;
@@ -37,7 +43,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account createAccount(CreateAccountRequest request) {
+        log.info("Creating account, accountNumber={}", request.accountNumber());
+
         if (accountRepository.findByAccountNumber(request.accountNumber()).isPresent()) {
+            log.warn("Account already exists, accountNumber={}",
+                    request.accountNumber());
             throw new AccountAlreadyExistsException(request.accountNumber());
         }
 
@@ -49,15 +59,24 @@ public class AccountServiceImpl implements AccountService {
         account.setActive(request.active());
         account.setCustomerId(request.customerId());
 
-        return accountRepository.save(account);
+        Account saved = accountRepository.save(account);
+
+        log.info("Account created successfully, accountNumber={}",
+                saved.getAccountNumber());
+
+        return saved;
     }
 
     @Transactional(readOnly = true)
     @Override
     public AccountBalanceResponse getAccountBalance(String accountNumber) {
+        log.info("Fetching account balance, accountNumber={}", accountNumber);
 
         Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountNotFoundException(accountNumber));
+                .orElseThrow(() -> {
+                    log.warn("Account not found, accountNumber={}", accountNumber);
+                    return new AccountNotFoundException(accountNumber);
+                });
 
         return new AccountBalanceResponse(
                 account.getAccountNumber(),
@@ -73,12 +92,23 @@ public class AccountServiceImpl implements AccountService {
             BigDecimal amount,
             String type
     ) {
+        log.info("Registering transaction, accountNumber={}, type={}, amount={}",
+                accountNumber, type, amount);
+
         Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountNotFoundException(accountNumber));
+                .orElseThrow(() -> {
+                    log.warn("Account not found during transaction, accountNumber={}",
+                            accountNumber);
+                    return new AccountNotFoundException(accountNumber);
+                });
 
         BigDecimal newBalance = account.getCurrentBalance().add(amount);
 
         if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+            log.warn(
+                    "Insufficient balance, accountNumber={}, currentBalance={}, amount={}",
+                    accountNumber, account.getCurrentBalance(), amount
+            );
             throw new InsufficientBalanceException();
         }
 
@@ -93,6 +123,7 @@ public class AccountServiceImpl implements AccountService {
 
         transactionRepository.save(transaction);
         accountRepository.save(account);
+
         transactionEventPublisher.publish(
                 new TransactionCompletedEvent(
                         account.getCustomerId(),
@@ -104,6 +135,9 @@ public class AccountServiceImpl implements AccountService {
                 )
         );
 
+        log.info("Transaction completed successfully, accountNumber={}, newBalance={}",
+                accountNumber, newBalance);
+
         return new TransactionResponse(
                 account.getAccountNumber(),
                 type,
@@ -112,7 +146,8 @@ public class AccountServiceImpl implements AccountService {
                 transaction.getDate()
         );
     }
-
 }
+
+
 
 
